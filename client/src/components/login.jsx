@@ -14,10 +14,6 @@ class Login extends Component {
         };
     }
 
-    routeChange=()=> {
-        
-      }
-
     tryLogin = () => {
         if(this.state.currentUserID == "" || this.state.currentPassword == "") {
             alert("Please ensure you have both an ID and password entered");
