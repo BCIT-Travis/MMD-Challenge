@@ -7,6 +7,7 @@ import { Button } from 'react-bootstrap';
 import MultipleChoice from "components/multiple-choice";
 import MultipleSelect from "components/multiple-select";
 import FillInBlank from "components/fill-in-blank";
+import Marking from "components/marking";
 
 class Assignments extends Component {
     constructor(props){
@@ -29,8 +30,28 @@ class Assignments extends Component {
             return;
         }
 
-        console.log(this.props.user.userID);
         if(this.props.user.userType === "student"){
+            axios.get(`http://localhost:${process.env.REACT_APP_SERVER_PORT}/assignments`, {
+            params: {
+                userID: this.props.user.userID,
+                userType: this.props.user.userType
+            },
+            }).then((response) => {
+                let data = response.data;
+                data.forEach(x => {
+                    if(x.submittedAnswer != null){
+                        x.submittedAnswer = JSON.parse(x.submittedAnswer);
+                    }
+                });
+                this.setState({ assignments: data });
+            })
+            .catch((error) => {
+                console.error("Login error:", error);
+            });
+        }
+
+        // this is redundant because for this quickly made app they'll get almost the same view
+        if(this.props.user.userType === "instructor"){
             axios.get(`http://localhost:${process.env.REACT_APP_SERVER_PORT}/assignments`, {
             params: {
                 userID: this.props.user.userID,
@@ -51,14 +72,30 @@ class Assignments extends Component {
         }
     }
 
+    // would make a generic for these 2 following methods in a seperate server request object
     submitAssignment = (assignmentID, data) => {
-        console.log(assignmentID);
         const jsonData = JSON.stringify(data);
         axios.post(`http://localhost:${process.env.REACT_APP_SERVER_PORT}/assignments`, {
             action: "submit-assignment",
             userID: this.props.user.userID,
             assignmentID: assignmentID,
             submissionAnswer: jsonData
+          })
+          .then((response) => {
+            console.log(response);
+            // simply refresh the view with the updated state from server
+            this.refreshView();
+          })
+          .catch((error) => {
+            console.error(error);
+          });
+    }
+
+    gradeAssignment = (assignmentID, grade) => {
+        axios.post(`http://localhost:${process.env.REACT_APP_SERVER_PORT}/assignments`, {
+            action: "grade-assignment",
+            assignmentID: assignmentID,
+            grade: grade
           })
           .then((response) => {
             console.log(response);
@@ -79,6 +116,7 @@ class Assignments extends Component {
                 answer={assignment.submittedAnswer}
                 grade={assignment.grade}
                 ID={assignment.id}
+                userType={this.props.user.userType}
                 submissionHandler={this.submitAssignment}
             />
             <hr />
@@ -92,6 +130,7 @@ class Assignments extends Component {
                 answer={assignment.submittedAnswer}
                 grade={assignment.grade}
                 ID={assignment.id}
+                userType={this.props.user.userType}
                 submissionHandler={this.submitAssignment}
             />
             <hr />
@@ -104,6 +143,7 @@ class Assignments extends Component {
                 answer={assignment.submittedAnswer}
                 grade={assignment.grade}
                 ID={assignment.id}
+                userType={this.props.user.userType}
                 submissionHandler={this.submitAssignment}
             />
             <hr />
@@ -114,14 +154,38 @@ class Assignments extends Component {
         }
     }
 
+    renderMarking(assignment, index) {
+        const rendered = <div className="marking-box">
+            <Marking
+            key = {index}
+            assignment = {assignment}
+            submissionHandler = {this.gradeAssignment}
+         />
+        </div>
+
+         return rendered;
+    }
+
     render() {
         return <div className="container">
-            { this.props.user.userType === "student" }
-            <h2>Your current assignments: </h2>
-            <hr />
-            {this.state.assignments.map((assignment, index) => {
-                return this.renderAssignment(assignment, index);
-             })}
+            { this.props.user.userType === "student" && 
+                <div className="container">
+                    <h2>Your current assignments: </h2>
+                    <hr />
+                    {this.state.assignments.map((assignment, index) => {
+                        return this.renderAssignment(assignment, index);
+                    })} 
+                </div>
+             }
+             { this.props.user.userType === "instructor" && 
+                <div className="container">
+                    <h2>Submitted assignments: </h2>
+                    <hr />
+                    {this.state.assignments.map((assignment, index) => {
+                        return this.renderMarking(assignment, index);
+                    })} 
+                </div>
+             }
         </div>
     }
 }

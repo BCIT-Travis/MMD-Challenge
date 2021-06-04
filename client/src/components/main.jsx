@@ -18,9 +18,9 @@ class Main extends Component {
         this.state = {
             // need to make a full stack app in basically a day so hello plain unsecure credentials!
             user: {
-                userName: "Joe",
-                userID: "A01111111",
-                userType: "student"
+                userName: "Amanda",
+                userID: "A00123456",
+                userType: "instructor"
             }
         };
     }

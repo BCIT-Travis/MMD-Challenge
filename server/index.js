@@ -16,7 +16,7 @@ const pool = mysql.createPool({
 
 app.use(cors());
 
-const jsonParser = bodyParser.json()
+const jsonParser = bodyParser.json();
 
 app.listen(process.env.REACT_APP_SERVER_PORT, () => {
   console.log(`App server now listening on port ${process.env.REACT_APP_SERVER_PORT}`);
@@ -38,7 +38,15 @@ app.get('/assignments', (req, res) => {
         return res.send(results);
       }
     });
-  }
+  }else if(userType === "instructor") {
+    pool.query(`select id, student, type, grade, submittedAnswer from Assignments`, (err, results) => {
+      if (err) {
+        return res.send(err);
+      } else {
+        return res.send(results);
+      }
+    });
+  } 
 });
 
 // for post actions due to time constraints we're going to be foolishly trusting here
@@ -47,6 +55,15 @@ app.post('/assignments', jsonParser, (req, res) => {
   switch(req.body.action) {
     case "submit-assignment":
       pool.query(`update Assignments set submittedAnswer = '${req.body.submissionAnswer}' where id = '${req.body.assignmentID}'`, (err, results) => {
+        if (err) {
+          return res.send(err);
+        } else {
+          return res.send(results);
+        }
+      });
+      break;
+    case "grade-assignment":
+      pool.query(`update Assignments set grade = '${req.body.grade}' where id = '${req.body.assignmentID}'`, (err, results) => {
         if (err) {
           return res.send(err);
         } else {

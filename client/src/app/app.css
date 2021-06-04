@@ -2,6 +2,9 @@
     width: 10em;
 }
 
-.answered {
-    background-color: yellow;
+.marking-box {
+    border-radius: 3px;
+    border: 1px solid lightgray;
+    padding: 0.5em;
+    margin-bottom: 1em;
 }
