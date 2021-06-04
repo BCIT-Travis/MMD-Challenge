@@ -49,9 +49,31 @@ app.get('/assignments', (req, res) => {
   } 
 });
 
+app.get('/students', (req, res) => {
+  const userID = req.query.userID;
+  const userType = req.query.userType
+
+  if(typeof userID  === "undefined" || typeof userType  === "undefined"){
+    return res.send(BAD_REQUEST);
+  }
+
+  if(userType === "instructor") {
+    pool.query(`select name, id from Users`, (err, results) => {
+      if (err) {
+        return res.send(err);
+      } else {
+        return res.send(results);
+      }
+    });
+  } else { 
+    return res.send("Invalid User Type");
+  }
+
+  
+});
+
 // for post actions due to time constraints we're going to be foolishly trusting here
 app.post('/assignments', jsonParser, (req, res) => {
-  console.log("cool messaage", req.body);
   switch(req.body.action) {
     case "submit-assignment":
       pool.query(`update Assignments set submittedAnswer = '${req.body.submissionAnswer}' where id = '${req.body.assignmentID}'`, (err, results) => {
@@ -64,6 +86,22 @@ app.post('/assignments', jsonParser, (req, res) => {
       break;
     case "grade-assignment":
       pool.query(`update Assignments set grade = '${req.body.grade}' where id = '${req.body.assignmentID}'`, (err, results) => {
+        if (err) {
+          return res.send(err);
+        } else {
+          return res.send(results);
+        }
+      });
+      break;
+    default:
+      return res.send(BAD_REQUEST);
+  }
+});
+
+app.post('/students', jsonParser, (req, res) => {
+  switch(req.body.action) {
+    case "add-student":
+      pool.query(`insert into Users (id, name, password, type) values ('${req.body.studentID}', '${req.body.studentName}', '${req.body.studentPassword}', 'student')`, (err, results) => {
         if (err) {
           return res.send(err);
         } else {

@@ -40,9 +40,9 @@ CREATE TABLE `Assignments` (
 --
 
 INSERT INTO `Assignments` (`id`, `type`, `student`, `grade`, `submittedAnswer`) VALUES
-(1, 'multiple-choice', 'A01111111', NULL, NULL),
-(2, 'multiple-select', 'A01111111', NULL, NULL),
-(3, 'fill-in-blank', 'A01111111', NULL, NULL),
+(1, 'multiple-choice', 'A01111111', 100, '\"2017\"'),
+(2, 'multiple-select', 'A01111111', NULL, '[\"Technical Illustration\", \"Instructional Design\", \"Finacial Advice\"]'),
+(3, 'fill-in-blank', 'A01111111', NULL, '\"someguy 2020\"'),
 (4, 'multiple-choice', 'A02222222', NULL, NULL),
 (5, 'multiple-select', 'A02222222', NULL, NULL),
 (6, 'fill-in-blank', 'A02222222', NULL, NULL),

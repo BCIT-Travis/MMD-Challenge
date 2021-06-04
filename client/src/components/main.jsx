@@ -10,6 +10,7 @@ import { Button } from 'react-bootstrap';
 
 import Login from "components/login";
 import Assignments from "components/assignments";
+import AddStudents from "components/add-students";
 
 class Main extends Component {
     constructor(props){
@@ -18,9 +19,9 @@ class Main extends Component {
         this.state = {
             // need to make a full stack app in basically a day so hello plain unsecure credentials!
             user: {
-                userName: "Amanda",
-                userID: "A00123456",
-                userType: "instructor"
+                userName: null,
+                userID: null,
+                userType: null
             }
         };
     }
@@ -50,11 +51,21 @@ class Main extends Component {
                             <Link to="/assignments">Assignments</Link>
                         </li>
                         }
+                        { this.state.user.userType === "instructor" && 
+                        <li>
+                            <Link to="/students">Students</Link>
+                        </li>
+                        }
                     </ul>
                     </nav>
                     <Switch>
                     <Route path="/assignments">
                         <Assignments
+                            user = { this.state.user }
+                         />
+                    </Route>
+                    <Route path="/students">
+                        <AddStudents
                             user = { this.state.user }
                          />
                     </Route>
